@@ -16,7 +16,7 @@ public class Database : IDatabase
         if (!Path.Exists(path))
         {
             //create the file
-            InitDatabase();
+            InitDatabase(path);
         }
         else
         {
@@ -28,7 +28,7 @@ public class Database : IDatabase
         }
     }
 
-    private async void InitDatabase()
+    private async void InitDatabase(string path)
     {
         var emptyDb = new List<FileHistory>();
         var json = JsonSerializer.Serialize(emptyDb);
@@ -36,7 +36,8 @@ public class Database : IDatabase
         await _fileSemaphore.WaitAsync();
         try
         {
-            await File.WriteAllTextAsync(_path, json);
+            await File.WriteAllTextAsync(path, json);
+            _path = path;
         }
         finally
         {
@@ -44,14 +45,39 @@ public class Database : IDatabase
         }
     }
 
-    public bool AddFileState(string fileName, FileState fileState)
+    public void AddFileState(string fileName, FileState fileState)
     {
         _dbSemaphore.Wait();
         try
         {
             var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+            if (fileHistory == null)
+            {
+                if (fileState.Operation == FileOperation.Rename)
+                {
+                    //rename the history of the file
+                    var oldFileName = fileState.FileName;
+                    var oldFileHistory = _fileHistories.FirstOrDefault(x => x.FileName == oldFileName);
+                    if (oldFileHistory == null)
+                    {
+                        Console.WriteLine("File not found in database");
+                        return;
+                    }
+                    var index = _fileHistories.IndexOf(oldFileHistory);
+                    _fileHistories[index].FileName = fileName;
+                    _fileHistories[index].History.Add(fileState);
+                }
+                else
+                {
+                    _fileHistories.Add(new FileHistory
+                    {
+                        FileName = fileName,
+                        History = [fileState]
+                    });
+                }
+            }
+
             fileHistory?.History.Add(fileState);
-            return fileHistory != null;
         }
         finally
         {
@@ -152,7 +178,7 @@ public class Database : IDatabase
         _dbSemaphore.Wait();
         try
         {
-            return _fileHistories.FirstOrDefault(x => x.FileName == fileName)?.History.First();
+            return _fileHistories.LastOrDefault(x => x.FileName == fileName)?.History.Last();
         }
         finally
         {

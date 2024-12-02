@@ -17,7 +17,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TRACKING_DIRECTORY": "C:\\TMP",
-        "DB_JSON": "C:\\TMP\\db.json"
+        "DB_FILE": "db.json"
       }
     },
     "https": {
@@ -28,7 +28,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TRACKING_DIRECTORY":  "C:\\TMP",
-        "DB_JSON":  "C:\\TMP\\db.json"
+        "DB_FILE":  "db.json"
       }
     },
     "IIS Express": {
@@ -37,7 +37,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TRACKING_DIRECTORY":  "C:\\TMP",
-        "DB_JSON":  "C:\\TMP\\db.json"
+        "DB_FILE":  "db.json"
       }
     }
   }

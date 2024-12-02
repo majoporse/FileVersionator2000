@@ -80,3 +80,7 @@ C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\obj\Debug\net8.0\refint
 C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\obj\Debug\net8.0\PresentationLayer.MVC.pdb
 C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\obj\Debug\net8.0\PresentationLayer.MVC.genruntimeconfig.cache
 C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\obj\Debug\net8.0\ref\PresentationLayer.MVC.dll
+C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\bin\Debug\net8.0\database.json
+C:\Users\majop\FileVersionator2000\PresentationLayer.MVC\bin\Debug\net8.0\db.json

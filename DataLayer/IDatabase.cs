@@ -2,7 +2,7 @@
 
 public interface IDatabase
 {
-    public bool AddFileState(string fileName, FileState fileState);
+    public void AddFileState(string fileName, FileState fileState);
     public bool RemoveFileState(string fileName, FileState fileVersion);
     public bool RemoveFileHistory(string fileName);
     public bool UpdateFileState(string fileName, FileState fileVersion);

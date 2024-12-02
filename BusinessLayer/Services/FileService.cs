@@ -49,12 +49,8 @@ public class FileService: IFileService
             },
             Operation = FileOperation.Create
         };
-        
-        if (!_db.AddFileState(fileName, fileState))
-        {
-            Console.WriteLine("Failed to add file to database");
-            return false;
-        }
+
+        _db.AddFileState(fileName, fileState);
         return await _db.SaveChangesAsync();
     }
 
@@ -91,48 +87,59 @@ public class FileService: IFileService
             if (lastState.Operation == FileOperation.Delete)
                 continue;
             
-            var hash = await HashUtils.HashMd5(fileName);
-            var fileNameFromPrevHash = fileHashes.GetValueOrDefault(lastState.CurrentVersion.FileHash);
-
+            var lastHash = lastState.CurrentVersion.FileHash;
+            
             var operation = FileOperation.Delete;
-            if (fileNameFromPrevHash == fileName && lastState.CurrentVersion.FileHash == hash)
+            var hash = lastHash;
+            var newFileName = fileName;
+            
+            var fileNameFromPrevHash = fileHashes.GetValueOrDefault(lastHash);
+            var fileContentUnchanged = fileNameFromPrevHash != null;
+            
+            if (File.Exists(fileName))
             {
-                continue;
-            }
-            if (fileNameFromPrevHash == fileName && lastState.CurrentVersion.FileHash != hash)
-            {
-                operation = FileOperation.Edit;
-            }
-            if (fileNameFromPrevHash != fileName && fileNameFromPrevHash != null)
-            {
-                operation = FileOperation.Rename;
-            }
+                hash = await HashUtils.HashMd5(fileName);
+                if (fileNameFromPrevHash == fileName && fileContentUnchanged)
+                    continue;
 
+                if (lastHash != hash)
+                    operation = FileOperation.Edit;
+
+            }
+            else
+            {
+                if (fileContentUnchanged)
+                {
+                    operation = FileOperation.Rename;
+                    newFileName = fileNameFromPrevHash;
+                }
+            }
             
             var fileState = new FileState
             {
                 CurrentVersion = new FileVersion
                 {
                     Version = lastState.CurrentVersion.Version + 1,
-                    FileSize = new FileInfo(fileName).Length,
+                    FileSize = new FileInfo(newFileName).Length,
                     FileHash = hash,
                     CreatedAt = DateTime.Now
                 },
-                Operation = operation
+                Operation = operation,
+                FileName = fileName
             };
-            res.Add((fileName, fileState));
+            res.Add((newFileName, fileState));
         }
         
         return res;
     }
     
-    public async Task<bool> CreateSnapshot()
+    public async Task<bool> CreateSnapshotAsync()
     {
         (await GetNewFileStates()).ForEach(x => _db.AddFileState(x.Item1, x.Item2));
         return await _db.SaveChangesAsync();
     }
 
-    public async Task<List<LastFileOperationDto>> GetLastFileOperations()
+    public async Task<List<LastFileOperationDto>> GetLastFileOperationsAsync()
     {
         return (await GetNewFileStates()).Select(e => new LastFileOperationDto
         {
@@ -141,9 +148,9 @@ public class FileService: IFileService
         }).ToList();
     }
 
-    public List<FileState>? GetFileStates(string fileName)
+    public FileHistory? GetFileHistory(string fileName)
     {
-        return _db.GetFileHistory(fileName)?.History;
+        return _db.GetFileHistory(fileName);
     }
 
     public FileState? GetFileState(string fileName, string version)
@@ -168,5 +175,31 @@ public class FileService: IFileService
             FilePath = e,
             IsSelected = false
         })).OrderBy(e1 => e1.FileName).ToList();
+    }
+
+    public string GetTrackingDirectory()
+    {
+        return _trackedDirectory;
+    }
+
+    public async Task<bool> EnableTrackingAsync(IEnumerable<string> selectedFiles)
+    {   
+        foreach (var file in selectedFiles)
+        {
+            if (!File.Exists(file))
+            {
+                Console.WriteLine($"File {file} does not exist");
+                continue;
+            }
+            if (!ListTrackedFiles().Contains(file))
+            {
+                await TrackFileAsync(file);
+            }
+            else
+            {
+                Console.WriteLine($"File {file} is already tracked");
+            }
+        }
+        return true;
     }
 }
