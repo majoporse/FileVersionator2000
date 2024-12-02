@@ -68,7 +68,8 @@ public class FileService: IFileService
     private async Task<List<(string, FileState)>> GetNewFileStates()
     {
         var fileHashes = new Dictionary<string, string>();
-        foreach (var filename in Directory.GetFiles(_trackedDirectory, "*", SearchOption.AllDirectories).ToList())
+        foreach (var filename in Directory.GetFiles(_trackedDirectory, "*", SearchOption.AllDirectories)
+                     .Except(ListTrackedFiles()).ToList())
         {
             fileHashes.TryAdd(await HashUtils.HashMd5(filename), filename);
         }
@@ -120,7 +121,7 @@ public class FileService: IFileService
                 CurrentVersion = new FileVersion
                 {
                     Version = lastState.CurrentVersion.Version + 1,
-                    FileSize = new FileInfo(newFileName).Length,
+                    FileSize = operation == FileOperation.Delete ? 0 : new FileInfo(newFileName).Length,
                     FileHash = hash,
                     CreatedAt = DateTime.Now
                 },
