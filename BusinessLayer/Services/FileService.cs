@@ -70,7 +70,7 @@ public class FileService: IFileService
         var fileHashes = new Dictionary<string, string>();
         foreach (var filename in Directory.GetFiles(_trackedDirectory, "*", SearchOption.AllDirectories).ToList())
         {
-            fileHashes.Add(await HashUtils.HashMd5(filename), filename);
+            fileHashes.TryAdd(await HashUtils.HashMd5(filename), filename);
         }
 
         var res = new List<(string, FileState)>();
@@ -99,7 +99,7 @@ public class FileService: IFileService
             if (File.Exists(fileName))
             {
                 hash = await HashUtils.HashMd5(fileName);
-                if (fileNameFromPrevHash == fileName && fileContentUnchanged)
+                if (hash == lastHash)
                     continue;
 
                 if (lastHash != hash)
