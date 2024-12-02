@@ -9,8 +9,12 @@ public class FileService: IFileService
     private readonly IDatabase _db;
     private readonly string _trackedDirectory;
     
-    FileService(IDatabase db, string trackedDirectory)
+    public FileService(IDatabase db, string trackedDirectory)
     {
+        if (!Directory.Exists(trackedDirectory))
+        {
+            Directory.CreateDirectory(trackedDirectory);
+        }
         _db = db;
         _trackedDirectory = trackedDirectory;
     }
@@ -145,5 +149,24 @@ public class FileService: IFileService
     public FileState? GetFileState(string fileName, string version)
     {
         return _db.GetFileHistory(fileName)?.History.FirstOrDefault(x => x.CurrentVersion.Version.ToString() == version);
+    }
+
+    public List<FileIsTrackedDto> GetTrackedFilesWithUntracked()
+    {
+        var trackedFiles = ListTrackedFiles();
+        var allFiles = Directory.GetFiles(_trackedDirectory, "*", SearchOption.AllDirectories).ToList();
+        
+        var untrackedFiles = allFiles.Except(trackedFiles).ToList();
+        return trackedFiles.Select(e => new FileIsTrackedDto
+        {
+            FileName = e,
+            FilePath = e,
+            IsSelected = true
+        }).Concat(untrackedFiles.Select(e => new FileIsTrackedDto
+        {
+            FileName = e,
+            FilePath = e,
+            IsSelected = false
+        })).OrderBy(e1 => e1.FileName).ToList();
     }
 }

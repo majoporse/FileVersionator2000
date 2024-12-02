@@ -13,4 +13,5 @@ public interface IFileService
     public Task<List<LastFileOperationDto>> GetLastFileOperations();
     public List<FileState>? GetFileStates(string fileName);
     public FileState? GetFileState(string fileName, string version);
+    public List<FileIsTrackedDto> GetTrackedFilesWithUntracked();
 }

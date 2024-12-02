@@ -1,4 +1,5 @@
-﻿@model ListTrackedFilesModel
+﻿@using DataLayer.Entities
+@model ListTrackedFilesModel
 
 @{
     ViewData["Title"] = "Tracked Files";
@@ -22,25 +23,35 @@
     @foreach (var fileEntry in Model.FileStates)
     {
         var fileState = fileEntry.FileState;
+        var operationClass = GetOperationClass(fileState.Operation);
 
-        <tr>
+        <tr class="@operationClass">
             <td>
                 <a asp-action="FileHistory" asp-route-fileName="@fileEntry.Name">
                     @fileEntry.Name
                 </a>
             </td>
             <td>@fileState.Operation</td>
-            @if (fileState.CurrentVersion != null)
-            {
-                <td>@fileState.CurrentVersion.Version</td>
-                <td>@(fileState.CurrentVersion.FileSize / 1024)</td>
-                <td>@fileState.CurrentVersion.CreatedAt.ToString("g")</td>
-            }
-            else
-            {
-                <td colspan="3" class="text-muted">N/A (File Unavailable)</td>
-            }
+            <td>@fileState.CurrentVersion.Version</td>
+            <td>@(fileState.CurrentVersion.FileSize / 1024)</td>
+            <td>@fileState.CurrentVersion.CreatedAt.ToString("g")</td>
         </tr>
     }
     </tbody>
 </table>
+
+@functions {
+    // This helper method returns the appropriate class based on the file operation
+    public string GetOperationClass(FileOperation? operation)
+    {
+        return operation switch
+        {
+            FileOperation.Create => "table-success", // Green for Create
+            FileOperation.Rename => "table-info",   // Blue for Rename
+            FileOperation.Edit => "table-warning",  // Yellow for Edit
+            FileOperation.Delete => "table-danger", // Red for Delete
+            FileOperation.Untrack => "table-secondary", // Gray for Untrack
+            _ => ""
+        };
+    }
+}

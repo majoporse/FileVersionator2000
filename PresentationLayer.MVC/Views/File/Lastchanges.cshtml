@@ -1,0 +1,49 @@
+﻿@using DataLayer.Entities
+@model IEnumerable<BusinessLayer.DTOs.LastFileOperationDto>
+
+@{
+    ViewBag.Title = "Last Changes";
+}
+
+<div class="d-flex justify-content-between align-items-center my-5">
+    <h2>📂 Last Changes</h2>
+    <!-- Snapshot creation form -->
+    <form action="@Url.Action("CreateSnapshot", "File")" method="post">
+        <button type="submit" class="btn btn-primary">
+            📸 Create Snapshot
+        </button>
+    </form>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Operation</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var file in Model)
+    {
+        <tr class="@GetOperationClass(file.Operation)">
+            <td>@file.FileName</td>
+            <td>@file.Operation</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@functions {
+    public string GetOperationClass(FileOperation operation)
+    {
+        return operation switch
+        {
+            FileOperation.Create => "table-success", // Green for Create
+            FileOperation.Rename => "table-info",   // Blue for Rename
+            FileOperation.Edit => "table-warning",  // Yellow for Edit
+            FileOperation.Delete => "table-danger", // Red for Delete
+            FileOperation.Untrack => "table-secondary", // Gray for Untrack
+            _ => ""
+        };
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using DataLayer.Entities;
+using System.Threading;
 
 namespace DataLayer;
 
@@ -7,8 +8,10 @@ public class Database : IDatabase
 {
     private List<FileHistory> _fileHistories = new();
     private string _path = "database.json";
-    
-    Database(string path)
+    private readonly SemaphoreSlim _fileSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _dbSemaphore = new(1, 1);
+
+    public Database(string path)
     {
         if (!Path.Exists(path))
         {
@@ -29,73 +32,139 @@ public class Database : IDatabase
     {
         var emptyDb = new List<FileHistory>();
         var json = JsonSerializer.Serialize(emptyDb);
-        await File.WriteAllTextAsync(_path, json);
-        
+
+        await _fileSemaphore.WaitAsync();
+        try
+        {
+            await File.WriteAllTextAsync(_path, json);
+        }
+        finally
+        {
+            _fileSemaphore.Release();
+        }
     }
 
     public bool AddFileState(string fileName, FileState fileState)
     {
-        var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
-        fileHistory?.History.Add(fileState);
-        return fileHistory != null;
+        _dbSemaphore.Wait();
+        try
+        {
+            var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+            fileHistory?.History.Add(fileState);
+            return fileHistory != null;
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
     }
 
     public bool RemoveFileState(string fileName, FileState fileVersion)
     {
-        var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
-        return fileHistory?.History.Remove(fileVersion) ?? false;
+        _dbSemaphore.Wait();
+        try
+        {
+            var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+            return fileHistory?.History.Remove(fileVersion) ?? false;
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
     }
 
     public bool RemoveFileHistory(string fileName)
     {
-        var ret =  _fileHistories.RemoveAll(x => x.FileName == fileName);
-        if (ret == 0)
+        _dbSemaphore.Wait();
+        try
         {
-            Console.WriteLine("File not found in database");
-            return false;
+            var ret = _fileHistories.RemoveAll(x => x.FileName == fileName);
+            if (ret == 0)
+            {
+                Console.WriteLine("File not found in database");
+                return false;
+            }
+            if (ret > 1)
+            {
+                Console.WriteLine("Multiple files found in database");
+                return false;
+            }
+            return true;
         }
-        if (ret > 1)
+        finally
         {
-            Console.WriteLine("Multiple files found in database");
-            return false;
+            _dbSemaphore.Release();
         }
-        return true;
     }
 
     public bool UpdateFileState(string fileName, FileState fileVersion)
     {
-        var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
-        if (fileHistory == null)
+        _dbSemaphore.Wait();
+        try
         {
-            return false;
+            var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+            if (fileHistory == null)
+            {
+                return false;
+            }
+            var index = fileHistory.History.FindIndex(x => x.CurrentVersion.Version == fileVersion.CurrentVersion.Version);
+            if (index == -1)
+            {
+                return false;
+            }
+            fileHistory.History[index] = fileVersion;
+            return true;
         }
-        var index = fileHistory.History.FindIndex(x => x.CurrentVersion.Version == fileVersion.CurrentVersion.Version);
-        if (index == -1)
+        finally
         {
-            return false;
+            _dbSemaphore.Release();
         }
-        fileHistory.History[index] = fileVersion;
-        return true;
     }
 
     public List<string> ListTrackedFiles()
     {
-        return _fileHistories.Select(x => x.FileName).ToList();
+        _dbSemaphore.Wait();
+        try
+        {
+            return _fileHistories.Select(x => x.FileName).ToList();
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
     }
 
     public FileHistory? GetFileHistory(string fileName)
     {
-        return _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+        _dbSemaphore.Wait();
+        try
+        {
+            return _fileHistories.FirstOrDefault(x => x.FileName == fileName);
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
     }
 
     public FileState? GetLatestFileState(string fileName)
     {
-        return _fileHistories.FirstOrDefault(x => x.FileName == fileName)?.History.First();
+        _dbSemaphore.Wait();
+        try
+        {
+            return _fileHistories.FirstOrDefault(x => x.FileName == fileName)?.History.First();
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
     }
 
     public async Task<bool> SaveChangesAsync()
     {
         var json = JsonSerializer.Serialize(_fileHistories);
+
+        await _fileSemaphore.WaitAsync();
         try
         {
             await File.WriteAllTextAsync(_path, json);
@@ -104,6 +173,10 @@ public class Database : IDatabase
         {
             Console.WriteLine(e);
             return false;
+        }
+        finally
+        {
+            _fileSemaphore.Release();
         }
 
         return true;
@@ -116,14 +189,34 @@ public class Database : IDatabase
             return false;
         }
 
-        var json = await File.ReadAllTextAsync(_path);
+        string json;
+        await _fileSemaphore.WaitAsync();
+        try
+        {
+            json = await File.ReadAllTextAsync(_path);
+        }
+        finally
+        {
+            _fileSemaphore.Release();
+        }
+
         var db = JsonSerializer.Deserialize<List<FileHistory>>(json);
         if (db == null)
         {
             Console.WriteLine("Failed to load database");
             return false;
         }
-        _fileHistories = db;
+
+        await _dbSemaphore.WaitAsync();
+        try
+        {
+            _fileHistories = db;
+        }
+        finally
+        {
+            _dbSemaphore.Release();
+        }
+
         return true;
     }
 

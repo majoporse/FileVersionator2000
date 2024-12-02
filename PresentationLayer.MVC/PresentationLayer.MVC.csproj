@@ -10,4 +10,8 @@
       <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,15 @@
+using BusinessLayer.Installers;
+using BusinessLayer.Services;
+using DataLayer;
+using DataLayer.Entities;
+using DataLayer.Installers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.DbInstall();
+builder.Services.BlInstall();
 
 var app = builder.Build();
 
@@ -22,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=File}/{action=Files}/{id?}");
 
 app.Run();

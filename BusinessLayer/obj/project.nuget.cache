@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "mzO82MwUhFI=",
+  "dgSpecHash": "akUifO5c+8Q=",
   "success": true,
   "projectFilePath": "C:\\Users\\majop\\FileVersionator2000\\BusinessLayer\\BusinessLayer.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\majop\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.0\\microsoft.extensions.dependencyinjection.9.0.0.nupkg.sha512",
+    "C:\\Users\\majop\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.0\\microsoft.extensions.dependencyinjection.abstractions.9.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

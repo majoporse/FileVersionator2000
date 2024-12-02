@@ -15,7 +15,9 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5177",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TRACKING_DIRECTORY": "C:\\TMP",
+        "DB_JSON": "C:\\TMP\\db.json"
       }
     },
     "https": {
@@ -24,14 +26,18 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7156;http://localhost:5177",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TRACKING_DIRECTORY":  "C:\\TMP",
+        "DB_JSON":  "C:\\TMP\\db.json"
       }
     },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TRACKING_DIRECTORY":  "C:\\TMP",
+        "DB_JSON":  "C:\\TMP\\db.json"
       }
     }
   }

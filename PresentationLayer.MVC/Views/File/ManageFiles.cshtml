@@ -1,0 +1,78 @@
+﻿@model List<BusinessLayer.DTOs.FileIsTrackedDto>
+
+@{
+    ViewBag.Title = "File Tracker";
+}
+
+<h2>📂 File Tracker</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
+<form action="@Url.Action("EnableTracking", "File")" method="post">
+    <table class="table table-striped custom" id="fileTable">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>File Path</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var file in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedFiles" value="@file.FilePath" class="file-checkbox d-none" />
+                        @file.FileName
+                    </td>
+                    <td>@file.FilePath</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary mt-3">Enable Tracking</button>
+</form>
+
+<!-- JavaScript to handle row click and styling -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const table = document.getElementById("fileTable");
+
+        table.addEventListener("click", function (event) {
+            // Find the closest row (tr) from the click target
+            const row = event.target.closest("tr");
+
+            if (!row || row.parentNode.tagName === "THEAD") return; // Ignore header clicks
+
+            // Find the checkbox within the clicked row
+            const checkbox = row.querySelector(".file-checkbox");
+            if (checkbox) {
+                console.log("Checkbox clicked:", checkbox.checked);
+                checkbox.checked = !checkbox.checked; // Toggle the checkbox
+
+                // Toggle the highlight class for the row
+                row.classList.toggle("highlighted", checkbox.checked);
+            }
+        });
+    });
+</script>
+
+<!-- Styling for the row -->
+<style>
+    /* Cursor pointer on row hover */
+    #fileTable tbody tr {
+        cursor: pointer;
+    }
+
+    .table tr:hover td {
+        background-color: #ffe3c6 !important; /* Use more specific selector */
+    }
+    .table .highlighted td {
+        background-color: #bfffc3 !important; /* Use more specific selector */
+    }
+</style>
