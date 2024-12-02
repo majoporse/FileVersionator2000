@@ -1,0 +1,12 @@
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\bin\Debug\net8.0\Commons.deps.json
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\bin\Debug\net8.0\Commons.dll
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\bin\Debug\net8.0\Commons.pdb
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.AssemblyInfoInputs.cache
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.AssemblyInfo.cs
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.csproj.CoreCompileInputs.cache
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.sourcelink.json
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.dll
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\refint\Commons.dll
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\Commons.pdb
+C:\Users\majop\PuxDemo\FileVersionator2000\Commons\obj\Debug\net8.0\ref\Commons.dll

@@ -10,11 +10,30 @@ public class Database : IDatabase
     
     Database(string path)
     {
-        _path = path;
-        Load();
+        if (!Path.Exists(path))
+        {
+            //create the file
+            InitDatabase();
+        }
+        else
+        {
+            _path = path;
+            if (!Load().Result)
+            {
+                throw new Exception("Failed to load database");
+            }
+        }
     }
 
-    public bool AddFile(string fileName, FileState fileState)
+    private async void InitDatabase()
+    {
+        var emptyDb = new List<FileHistory>();
+        var json = JsonSerializer.Serialize(emptyDb);
+        await File.WriteAllTextAsync(_path, json);
+        
+    }
+
+    public bool AddFileState(string fileName, FileState fileState)
     {
         var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
         fileHistory?.History.Add(fileState);
@@ -25,6 +44,22 @@ public class Database : IDatabase
     {
         var fileHistory = _fileHistories.FirstOrDefault(x => x.FileName == fileName);
         return fileHistory?.History.Remove(fileVersion) ?? false;
+    }
+
+    public bool RemoveFileHistory(string fileName)
+    {
+        var ret =  _fileHistories.RemoveAll(x => x.FileName == fileName);
+        if (ret == 0)
+        {
+            Console.WriteLine("File not found in database");
+            return false;
+        }
+        if (ret > 1)
+        {
+            Console.WriteLine("Multiple files found in database");
+            return false;
+        }
+        return true;
     }
 
     public bool UpdateFileState(string fileName, FileState fileVersion)
@@ -43,6 +78,11 @@ public class Database : IDatabase
         return true;
     }
 
+    public List<string> ListTrackedFiles()
+    {
+        return _fileHistories.Select(x => x.FileName).ToList();
+    }
+
     public FileHistory? GetFileHistory(string fileName)
     {
         return _fileHistories.FirstOrDefault(x => x.FileName == fileName);
@@ -53,20 +93,42 @@ public class Database : IDatabase
         return _fileHistories.FirstOrDefault(x => x.FileName == fileName)?.History.First();
     }
 
-    public void SaveChanges()
+    public async Task<bool> SaveChangesAsync()
     {
         var json = JsonSerializer.Serialize(_fileHistories);
-        File.WriteAllText(_path, json);
+        try
+        {
+            await File.WriteAllTextAsync(_path, json);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return true;
     }
 
-    public void Load()
+    public async Task<bool> Load()
     {
         if (!File.Exists(_path))
         {
-            return;
+            return false;
         }
 
-        var json = File.ReadAllText(_path);
-        _fileHistories = JsonSerializer.Deserialize<List<FileHistory>>(json);
+        var json = await File.ReadAllTextAsync(_path);
+        var db = JsonSerializer.Deserialize<List<FileHistory>>(json);
+        if (db == null)
+        {
+            Console.WriteLine("Failed to load database");
+            return false;
+        }
+        _fileHistories = db;
+        return true;
+    }
+
+    public async Task<bool> RevertChanges()
+    {
+        return await Load();
     }
 }

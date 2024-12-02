@@ -2,11 +2,14 @@
 
 public interface IDatabase
 {
-    public bool AddFile(string fileName, FileState fileState);
+    public bool AddFileState(string fileName, FileState fileState);
     public bool RemoveFileState(string fileName, FileState fileVersion);
+    public bool RemoveFileHistory(string fileName);
     public bool UpdateFileState(string fileName, FileState fileVersion);
+    public List<string> ListTrackedFiles();
     public FileHistory? GetFileHistory(string fileName);
     public FileState? GetLatestFileState(string fileName);
-    public void SaveChanges();
-    public void Load();
+    public Task<bool> SaveChangesAsync();
+    public Task<bool> Load();
+    public Task<bool> RevertChanges();
 }

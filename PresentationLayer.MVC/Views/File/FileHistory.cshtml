@@ -1,0 +1,36 @@
+﻿@model DataLayer.Entities.FileHistory
+
+@{
+ViewData["Title"] = "File History";
+}
+
+<h1>File History: @Model.FileName</h1>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Operation</th>
+        <th>Version</th>
+        <th>File Size (KB)</th>
+        <th>Snapshot Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var state in Model.History)
+    {
+    <tr>
+        <td>@state.Operation</td>
+        @if (state.CurrentVersion != null)
+        {
+        <td>@state.CurrentVersion.Version</td>
+        <td>@(state.CurrentVersion.FileSize / 1024)</td>
+        <td>@state.CurrentVersion.CreatedAt.ToString("g")</td>
+        }
+        else
+        {
+        <td colspan="3" class="text-muted">N/A (File Unavailable)</td>
+        }
+    </tr>
+    }
+    </tbody>
+</table>

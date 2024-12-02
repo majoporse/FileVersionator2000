@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {}
+    "net8.0": {
+      "Commons/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Commons.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Commons.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Commons/1.0.0": {
+      "type": "project",
+      "path": "../Commons/Commons.csproj",
+      "msbuildProject": "../Commons/Commons.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net8.0": []
+    "net8.0": [
+      "Commons >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\majop\\.nuget\\packages\\": {},
@@ -14,11 +33,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\majop\\PuxDemo\\FileVersionator2000\\DataLayer\\DataLayer.csproj",
+      "projectUniqueName": "C:\\Users\\majop\\FileVersionator2000\\DataLayer\\DataLayer.csproj",
       "projectName": "DataLayer",
-      "projectPath": "C:\\Users\\majop\\PuxDemo\\FileVersionator2000\\DataLayer\\DataLayer.csproj",
+      "projectPath": "C:\\Users\\majop\\FileVersionator2000\\DataLayer\\DataLayer.csproj",
       "packagesPath": "C:\\Users\\majop\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\majop\\PuxDemo\\FileVersionator2000\\DataLayer\\obj\\",
+      "outputPath": "C:\\Users\\majop\\FileVersionator2000\\DataLayer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -38,7 +57,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\majop\\FileVersionator2000\\Commons\\Commons.csproj": {
+              "projectPath": "C:\\Users\\majop\\FileVersionator2000\\Commons\\Commons.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

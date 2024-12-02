@@ -2,7 +2,9 @@
 
 public class FileVersion
 {
-    public string Version { get; set; }
-    public string FileSize { get; set; }
+    public int Version { get; set; }
+    public long FileSize { get; set; }
     public string FileHash { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
 }

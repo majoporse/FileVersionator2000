@@ -2,6 +2,6 @@
 
 public class FileState
 {
-    public FileOperation LastOperation { get; set; }
+    public FileOperation Operation { get; set; }
     public FileVersion CurrentVersion { get; set; }
 }

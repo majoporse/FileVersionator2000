@@ -1,0 +1,46 @@
+﻿@model ListTrackedFilesModel
+
+@{
+    ViewData["Title"] = "Tracked Files";
+}
+
+<h1>Tracked Files</h1>
+
+<p><strong>Directory:</strong> @Model.DirectoryPath</p>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>File Name</th>
+        <th>Operation</th>
+        <th>Version</th>
+        <th>File Size (KB)</th>
+        <th>Snapshot Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var fileEntry in Model.FileStates)
+    {
+        var fileState = fileEntry.FileState;
+
+        <tr>
+            <td>
+                <a asp-action="FileHistory" asp-route-fileName="@fileEntry.Name">
+                    @fileEntry.Name
+                </a>
+            </td>
+            <td>@fileState.Operation</td>
+            @if (fileState.CurrentVersion != null)
+            {
+                <td>@fileState.CurrentVersion.Version</td>
+                <td>@(fileState.CurrentVersion.FileSize / 1024)</td>
+                <td>@fileState.CurrentVersion.CreatedAt.ToString("g")</td>
+            }
+            else
+            {
+                <td colspan="3" class="text-muted">N/A (File Unavailable)</td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
